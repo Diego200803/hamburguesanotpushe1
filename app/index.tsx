@@ -1,9 +1,19 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/lib/modules/auth/AuthProvider';
 
 export default function Index() {
   const router = useRouter();
+  const { session, signOut } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Error al cerrar sesión:', error);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -11,6 +21,11 @@ export default function Index() {
         <View style={styles.header}>
           <Text style={styles.title}>🍔 Hamburguesa 3D</Text>
           <Text style={styles.subtitle}>Arma tu hamburguesa perfecta</Text>
+          {session && (
+            <Text style={styles.userInfo}>
+              Bienvenido: {session.user.email}
+            </Text>
+          )}
         </View>
 
         <View style={styles.menuContainer}>
@@ -24,6 +39,16 @@ export default function Index() {
               Visualiza y personaliza tu hamburguesa interactiva
             </Text>
           </TouchableOpacity>
+
+          {session && (
+            <TouchableOpacity
+              style={[styles.menuButton, styles.logoutButton]}
+              onPress={handleLogout}
+            >
+              <Text style={styles.menuIcon}>🚪</Text>
+              <Text style={styles.menuTitle}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         <View style={styles.footer}>
@@ -60,6 +85,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#94a3b8',
   },
+  userInfo: {
+    fontSize: 14,
+    color: '#10b981',
+    marginTop: 10,
+  },
   menuContainer: {
     gap: 20,
   },
@@ -75,6 +105,9 @@ const styles = StyleSheet.create({
   },
   burgerButton: {
     backgroundColor: '#10b981',
+  },
+  logoutButton: {
+    backgroundColor: '#ef4444',
   },
   menuIcon: {
     fontSize: 60,
